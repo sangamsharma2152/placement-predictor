@@ -11,18 +11,35 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 
 # -----------------------------
-# 🔥 VANTA BACKGROUND
+# 🔥 FULL SCREEN VANTA BACKGROUND
 # -----------------------------
 components.html("""
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#vanta-bg {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    top: 0;
+    left: 0;
+}
+</style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 </head>
-<body>
 
-<div id="vanta-bg" style="width:100vw; height:100vh;"></div>
+<body>
+<div id="vanta-bg"></div>
 
 <script>
 VANTA.NET({
@@ -37,13 +54,25 @@ VANTA.NET({
 
 </body>
 </html>
-""", height=300)
+""", height=0)
 
-# Make content readable
+# -----------------------------
+# MAKE STREAMLIT TRANSPARENT
+# -----------------------------
 st.markdown("""
 <style>
-.main {
+.stApp {
     background: transparent !important;
+}
+
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
+
+.block-container {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 2rem;
+    border-radius: 15px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -65,8 +94,8 @@ if st.checkbox("Show Dataset"):
 # ENCODING
 # -----------------------------
 le = LabelEncoder()
-
 categorical_cols = ['Gender', 'Degree', 'Branch', 'Placement_Status']
+
 for col in categorical_cols:
     if col in train.columns:
         train[col] = le.fit_transform(train[col])
@@ -104,7 +133,7 @@ for col in X.columns:
         input_dict[col] = st.sidebar.number_input(col, 0, 100, 0)
 
 # -----------------------------
-# PREDICTION + AI SUGGESTIONS
+# PREDICTION + SUGGESTIONS
 # -----------------------------
 if st.sidebar.button("Predict Placement"):
 
@@ -130,7 +159,7 @@ if st.sidebar.button("Predict Placement"):
         suggestions.append("💻 Improve coding skills")
 
     if input_dict.get("Communication_Skills", 0) < 6:
-        suggestions.append("🗣 Improve communication")
+        suggestions.append("🗣 Improve communication skills")
 
     if input_dict.get("Internships", 0) < 2:
         suggestions.append("🏢 Gain internship experience")
@@ -150,16 +179,16 @@ if st.sidebar.button("Predict Placement"):
     else:
         st.success("🔥 Excellent profile!")
 
-    # Final advice
+    # Final Advice
     st.subheader("🎯 Final Evaluation")
 
     if prediction[0] == 1:
         st.info("You are on the right track. Keep improving!")
     else:
-        st.info("Focus on improvements to increase chances.")
+        st.info("Focus on improvements to increase placement chances.")
 
 # -----------------------------
-# VISUALIZATION SECTION
+# VISUALIZATION
 # -----------------------------
 
 st.subheader("📊 CGPA Distribution")
@@ -208,7 +237,7 @@ fig7 = px.scatter(train,
 st.plotly_chart(fig7)
 
 # -----------------------------
-# FINAL CONCLUSION
+# CONCLUSION
 # -----------------------------
 st.subheader("🧠 Conclusion")
 

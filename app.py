@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import plotly.express as px
@@ -10,9 +9,6 @@ import plotly.express as px
 # -----------------------------
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 
-# -----------------------------
-# Title
-# -----------------------------
 st.title("🎓 Student Placement Predictor Dashboard")
 
 # -----------------------------
@@ -25,11 +21,15 @@ if st.checkbox("Show Dataset"):
     st.dataframe(train.head())
 
 # -----------------------------
-# Encoding
+# Encode categorical columns
 # -----------------------------
 le = LabelEncoder()
-for col in ['Gender','Degree','Branch','Placement_Status']:
-    train[col] = le.fit_transform(train[col])
+
+categorical_cols = ['Gender', 'Degree', 'Branch', 'Placement_Status']
+
+for col in categorical_cols:
+    if col in train.columns:
+        train[col] = le.fit_transform(train[col])
 
 # -----------------------------
 # Features & Model
@@ -41,28 +41,40 @@ model = RandomForestClassifier()
 model.fit(X, y)
 
 # -----------------------------
-# SIDEBAR INPUT
+# SIDEBAR INPUT (DYNAMIC)
 # -----------------------------
 st.sidebar.header("📥 Enter Student Details")
 
-cgpa = st.sidebar.slider("CGPA", 0.0, 10.0, 7.0)
-internships = st.sidebar.number_input("Internships", 0, 10, 1)
-projects = st.sidebar.number_input("Projects", 0, 10, 2)
-coding = st.sidebar.slider("Coding Skills", 0, 10, 5)
-communication = st.sidebar.slider("Communication Skills", 0, 10, 5)
-aptitude = st.sidebar.slider("Aptitude Score", 0, 100, 50)
-certifications = st.sidebar.number_input("Certifications", 0, 10, 1)
-backlogs = st.sidebar.number_input("Backlogs", 0, 10, 0)
+input_dict = {}
+
+for col in X.columns:
+    if col == "CGPA":
+        input_dict[col] = st.sidebar.slider("CGPA", 0.0, 10.0, 7.0)
+
+    elif col in ["Internships", "Projects", "Certifications", "Backlogs"]:
+        input_dict[col] = st.sidebar.number_input(col, 0, 10, 1)
+
+    elif col in ["Coding_Skills", "Communication_Skills"]:
+        input_dict[col] = st.sidebar.slider(col, 0, 10, 5)
+
+    elif col == "Aptitude_Test_Score":
+        input_dict[col] = st.sidebar.slider("Aptitude Score", 0, 100, 50)
+
+    else:
+        # For any unexpected column
+        input_dict[col] = st.sidebar.number_input(col, 0, 100, 0)
 
 # -----------------------------
-# Prediction
+# Prediction (FIXED)
 # -----------------------------
 if st.sidebar.button("Predict Placement"):
-    input_data = np.array([[cgpa, internships, projects, coding,
-                            communication, aptitude,
-                            certifications, backlogs]])
 
-    prediction = model.predict(input_data)
+    input_df = pd.DataFrame([input_dict])
+
+    # Ensure correct column order
+    input_df = input_df[X.columns]
+
+    prediction = model.predict(input_df)
 
     if prediction[0] == 1:
         st.success("🎉 Student will be PLACED")
@@ -70,97 +82,71 @@ if st.sidebar.button("Predict Placement"):
         st.error("❌ Student will NOT be placed")
 
 # -----------------------------
-# CGPA DISTRIBUTION
+# 📊 CGPA DISTRIBUTION
 # -----------------------------
 st.subheader("📊 CGPA Distribution Analysis")
 
-st.markdown("""
-**CGPA (Cumulative Grade Point Average)** represents academic performance.
+fig1 = px.histogram(train, x="CGPA", color="Placement_Status", nbins=20)
+st.plotly_chart(fig1, use_container_width=True)
 
-Higher CGPA usually increases placement chances.
-""")
-
-fig = px.histogram(train, x="CGPA", color="Placement_Status", nbins=20)
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: Students with CGPA above ~7 have higher placement chances.")
+st.info("👉 Higher CGPA increases placement chances.")
 
 # -----------------------------
-# SKILLS ANALYSIS
+# 📊 SKILLS ANALYSIS
 # -----------------------------
-st.subheader("📊 Skills Impact on Placement")
+st.subheader("📊 Skills Impact")
 
-st.markdown("""
-Coding Skills → Technical ability  
-Communication Skills → Interview performance  
+fig2 = px.scatter(train,
+                  x="Coding_Skills",
+                  y="Communication_Skills",
+                  size="CGPA",
+                  color="Placement_Status")
 
-Both are equally important.
-""")
+st.plotly_chart(fig2, use_container_width=True)
 
-fig = px.scatter(train,
-                 x="Coding_Skills",
-                 y="Communication_Skills",
-                 size="CGPA",
-                 color="Placement_Status")
-
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: Balanced skillset = higher placement success.")
+st.info("👉 Balanced skills = better placement.")
 
 # -----------------------------
-# INTERNSHIP ANALYSIS
+# 📊 INTERNSHIP ANALYSIS
 # -----------------------------
 st.subheader("📊 Internship Impact")
 
-st.markdown("""
-Internships provide real-world experience and improve job readiness.
-""")
+fig3 = px.box(train,
+              x="Placement_Status",
+              y="Internships",
+              color="Placement_Status")
 
-fig = px.box(train,
-             x="Placement_Status",
-             y="Internships",
-             color="Placement_Status")
+st.plotly_chart(fig3, use_container_width=True)
 
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: More internships → better placement chances.")
+st.info("👉 More internships improve placement chances.")
 
 # -----------------------------
-# HEATMAP
+# 📊 HEATMAP
 # -----------------------------
 st.subheader("📊 Correlation Heatmap")
 
-st.markdown("""
-Correlation shows relationship between variables.
-
-+1 → Strong relation  
-0 → No relation  
-""")
-
 corr = train.corr()
 
-fig = px.imshow(corr, text_auto=True)
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: CGPA, skills and internships strongly influence placement.")
+fig4 = px.imshow(corr, text_auto=True)
+st.plotly_chart(fig4, use_container_width=True)
 
 # -----------------------------
-# PIE CHART
+# 📊 PIE CHART
 # -----------------------------
 st.subheader("📊 Placement Distribution")
 
 counts = train['Placement_Status'].value_counts()
 
-fig = px.pie(names=["Not Placed", "Placed"],
-             values=counts.values,
-             hole=0.4)
+fig5 = px.pie(
+    names=["Not Placed", "Placed"],
+    values=counts.values,
+    hole=0.4
+)
 
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: Shows overall placement success ratio.")
+st.plotly_chart(fig5, use_container_width=True)
 
 # -----------------------------
-# FEATURE IMPORTANCE
+# 📊 FEATURE IMPORTANCE
 # -----------------------------
 st.subheader("📊 Feature Importance")
 
@@ -171,46 +157,33 @@ imp_df = pd.DataFrame({
     "Importance": importance
 }).sort_values(by="Importance", ascending=False)
 
-fig = px.bar(imp_df, x="Feature", y="Importance")
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("👉 Insight: Top features have highest impact on placement.")
+fig6 = px.bar(imp_df, x="Feature", y="Importance")
+st.plotly_chart(fig6, use_container_width=True)
 
 # -----------------------------
-# ANIMATION
+# 🎬 ANIMATION
 # -----------------------------
-st.subheader("🎬 Animated Placement Analysis")
+st.subheader("🎬 Animated Placement Trend")
 
-fig = px.scatter(train,
-                 x="CGPA",
-                 y="Aptitude_Test_Score",
-                 color="Placement_Status",
-                 size="Coding_Skills",
-                 animation_frame="Age")
+fig7 = px.scatter(train,
+                  x="CGPA",
+                  y="Aptitude_Test_Score",
+                  color="Placement_Status",
+                  size="Coding_Skills",
+                  animation_frame="Age")
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig7, use_container_width=True)
 
 # -----------------------------
-# FINAL CONCLUSION
+# 🧠 CONCLUSION
 # -----------------------------
-st.subheader("🧠 Final Conclusion")
+st.subheader("🧠 Final Insights")
 
 st.markdown("""
-### 🔍 Key Insights:
-
 - CGPA strongly affects placement  
-- Coding + Communication skills are critical  
+- Skills are critical  
 - Internships improve chances  
-- Backlogs reduce success  
+- Backlogs reduce placement  
 
----
-
-### 🎯 Final Thought:
-
-Placement depends on a combination of:
-- Academic performance  
-- Skills  
-- Experience  
-
-👉 Balanced profile = highest success 🚀
+👉 Balanced profile leads to success 🚀
 """)

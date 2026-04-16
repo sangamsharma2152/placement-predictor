@@ -158,8 +158,12 @@ class CacheManager:
     @staticmethod
     @st.cache_data
     def load_training_data(filepath):
-        """Load training data with caching"""
-        return pd.read_csv(filepath)
+        """Load training data with caching and cleanup"""
+        df = pd.read_csv(filepath)
+        # Clean up unnecessary columns
+        cols_to_drop = [col for col in df.columns if col in ['Unnamed: 0', 'StudentId']]
+        df = df.drop(columns=cols_to_drop, errors='ignore')
+        return df
     
     @staticmethod
     @st.cache_data

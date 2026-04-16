@@ -16,10 +16,26 @@ st.title("📊 Data Dashboard")
 
 train = CacheManager.load_training_data("train.csv")
 
+# Clean up dataframe - drop unnecessary columns
+cols_to_drop = [col for col in train.columns if col in ['Unnamed: 0', 'StudentId']]
+train = train.drop(columns=cols_to_drop, errors='ignore')
+
 # Display stats
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Students", len(train))
-col2.metric("Placement Rate", f"{(train['PlacementStatus'].eq('Placed').sum() / len(train) * 100):.1f}%")
+
+# Safe column access with fallback
+try:
+    placement_rate = f"{(train['PlacementStatus'].eq('Placed').sum() / len(train) * 100):.1f}%"
+except KeyError:
+    # Try alternative column names
+    if 'Placement_Status' in train.columns:
+        placement_rate = f"{(train['Placement_Status'].sum() / len(train) * 100):.1f}%"
+    else:
+        placement_rate = "N/A"
+        st.warning("⚠️ PlacementStatus column not found")
+
+col2.metric("Placement Rate", placement_rate)
 col3.metric("Avg CGPA", f"{train['CGPA'].mean():.2f}")
 col4.metric("Avg Skills", f"{train['Skills'].mean():.1f}")
 

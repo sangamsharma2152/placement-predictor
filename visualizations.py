@@ -10,10 +10,15 @@ import numpy as np
 
 def create_cgpa_distribution(df):
     """CGPA distribution histogram"""
-    fig = px.histogram(df, x="CGPA", color="PlacementStatus",
-                       nbins=20, title="📊 CGPA Distribution by Placement Status",
-                       labels={'CGPA': 'CGPA', 'PlacementStatus': 'Status'},
-                       color_discrete_map={'Placed': '#51cf66', 'NotPlaced': '#ff6b6b'})
+    try:
+        fig = px.histogram(df, x="CGPA", color="PlacementStatus",
+                           nbins=20, title="📊 CGPA Distribution by Placement Status",
+                           labels={'CGPA': 'CGPA', 'PlacementStatus': 'Status'},
+                           color_discrete_map={'Placed': '#51cf66', 'NotPlaced': '#ff6b6b'})
+    except KeyError:
+        # Fallback if PlacementStatus doesn't exist
+        fig = px.histogram(df, x="CGPA",
+                           nbins=20, title="📊 CGPA Distribution")
     return fig
 
 
@@ -28,10 +33,14 @@ def create_skills_scatter(df):
 
 def create_internship_boxplot(df):
     """Internship impact on placement"""
-    fig = px.box(df, x="PlacementStatus", y="CGPA",
-                color="Internship",
-                title="🏢 CGPA Distribution by Internship Status",
-                color_discrete_map={'Yes': '#51cf66', 'No': '#ffd43b'})
+    try:
+        fig = px.box(df, x="PlacementStatus", y="CGPA",
+                    color="Internship",
+                    title="🏢 CGPA Distribution by Internship Status",
+                    color_discrete_map={'Yes': '#51cf66', 'No': '#ffd43b'})
+    except KeyError:
+        fig = px.box(df, x="Internship", y="CGPA",
+                    title="🏢 CGPA Distribution by Internship Status")
     return fig
 
 
@@ -46,11 +55,16 @@ def create_correlation_heatmap(df):
 
 def create_placement_pie(df):
     """Placement status pie chart"""
-    counts = df['PlacementStatus'].value_counts()
-    fig = px.pie(values=counts.values, names=counts.index,
-                title="📈 Overall Placement Distribution",
-                color_discrete_map={'Placed': '#51cf66', 'NotPlaced': '#ff6b6b'},
-                hole=0.3)
+    try:
+        counts = df['PlacementStatus'].value_counts()
+        fig = px.pie(values=counts.values, names=counts.index,
+                    title="📈 Overall Placement Distribution",
+                    color_discrete_map={'Placed': '#51cf66', 'NotPlaced': '#ff6b6b'},
+                    hole=0.3)
+    except KeyError:
+        # Fallback if PlacementStatus doesn't exist
+        fig = px.pie(values=[1], names=['Data'],
+                    title="📈 Placement Distribution (data unavailable)")
     return fig
 
 

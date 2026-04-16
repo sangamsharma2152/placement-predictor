@@ -97,14 +97,11 @@ with results_col:
             # Make prediction
             with st.spinner("Analyzing profile..."):
                 prediction, confidence = placement_model.predict(student_data, model_name)
-                salary = placement_model.predict_salary(prediction, cgpa, coding_skills, internships, certifications)
                 
                 if prediction == 1:
                     st.success(f"✅ PLACEMENT PREDICTED\n\nConfidence: {confidence:.1f}%")
                 else:
                     st.error(f"❌ NOT LIKELY TO BE PLACED\n\nConfidence: {100-confidence:.1f}%")
-                
-                st.info(f"💰 Expected Salary: {salary}")
 
 st.divider()
 
@@ -152,19 +149,19 @@ with tab4:
     
     with col_scenario_a:
         scenario_cgpa = st.slider("Scenario CGPA", 0.0, 10.0, cgpa, 0.1)
-        scenario_coding = st.slider("Scenario Coding", 0, 10, coding_skills)
+        scenario_skills = st.slider("Scenario Skills", 0, 10, skills)
     
     with col_scenario_b:
-        scenario_intern = st.number_input("Scenario Internships", 0, 10, internships)
+        scenario_projects = st.number_input("Scenario Major Projects", 0, 5, major_projects)
         scenario_backlogs = st.number_input("Scenario Backlogs", 0, 10, backlogs)
     
     if st.button("Simulate"):
         scenario_data = student_data.copy()
         scenario_data.update({
             'CGPA': scenario_cgpa,
-            'Coding_Skills': scenario_coding,
-            'Internships': scenario_intern,
-            'Backlogs': scenario_backlogs
+            'Skills': scenario_skills,
+            'Major Projects': scenario_projects,
+            'backlogs': scenario_backlogs
         })
         
         scenario_pred, scenario_conf = placement_model.predict(scenario_data, model_name)

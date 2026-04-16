@@ -107,27 +107,43 @@ class PlacementModel:
         model = self.models[model_name]
         y_pred = model.predict(self.X_test)
         
-        # Ensure y_test is numeric
-        y_test_numeric = self.y_test
+        # Ensure y_test and y_pred are compatible
+        y_test_numeric = self.y_test.copy()
+        y_pred_numeric = y_pred.copy()
+        
+        # Convert Series to numpy array if needed
         if isinstance(y_test_numeric, pd.Series):
             y_test_numeric = y_test_numeric.values
         
+        # Ensure both are numeric
         try:
-            # Convert to numeric if needed
-            if y_pred.dtype == 'object':
-                le = LabelEncoder()
-                y_pred = le.fit_transform(y_pred)
-            if y_test_numeric.dtype == 'object':
-                le = LabelEncoder()
-                y_test_numeric = le.fit_transform(y_test_numeric)
-        except:
-            pass
+            # Try using the stored target encoder if available
+            if '_target_' in self.label_encoders:
+                if y_test_numeric.dtype == 'object':
+                    y_test_numeric = self.label_encoders['_target_'].transform(y_test_numeric)
+                if y_pred_numeric.dtype == 'object':
+                    y_pred_numeric = self.label_encoders['_target_'].transform(y_pred_numeric)
+            else:
+                # Fallback: encode individually but ensure consistency
+                if y_test_numeric.dtype == 'object':
+                    le_test = LabelEncoder()
+                    y_test_numeric = le_test.fit_transform(y_test_numeric)
+                if y_pred_numeric.dtype == 'object':
+                    le_pred = LabelEncoder()
+                    y_pred_numeric = le_pred.fit_transform(y_pred_numeric)
+        except Exception as e:
+            print(f"Error encoding targets: {e}")
+            return None
+        
+        # Ensure both are numpy arrays and same length
+        y_test_numeric = np.asarray(y_test_numeric, dtype=np.int32)
+        y_pred_numeric = np.asarray(y_pred_numeric, dtype=np.int32)
         
         metrics = {
-            'Accuracy': accuracy_score(y_test_numeric, y_pred),
-            'Precision': precision_score(y_test_numeric, y_pred, zero_division=0, average='binary'),
-            'Recall': recall_score(y_test_numeric, y_pred, zero_division=0, average='binary'),
-            'F1-Score': f1_score(y_test_numeric, y_pred, zero_division=0, average='binary')
+            'Accuracy': accuracy_score(y_test_numeric, y_pred_numeric),
+            'Precision': precision_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
+            'Recall': recall_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
+            'F1-Score': f1_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary')
         }
         
         try:
@@ -150,21 +166,33 @@ class PlacementModel:
         for col in CATEGORICAL_COLS:
             if col in df_input.columns and col in self.label_encoders:
                 try:
-                    df_input[col] = self.label_encoders[col].transform(df_input[col])
+                    df_input[col] = self.label_encoders[col].transform(df_input[col].astype(str))
                 except:
-                    df_input[col] = -1
+                    df_input[col] = 0
+        
+        # Ensure all required features are present and in correct order
+        for col in self.feature_names:
+            if col not in df_input.columns:
+                df_input[col] = 0
+        
+        # Select only the features used during training, in the same order
+        df_input = df_input[self.feature_names]
         
         # Get model
         model = self.models[model_name]
         
-        # Predict
-        prediction = model.predict(df_input)[0]
-        
-        # Get confidence
         try:
-            confidence = max(model.predict_proba(df_input)[0]) * 100
-        except:
-            confidence = 50 if prediction == 1 else 50
+            # Predict
+            prediction = model.predict(df_input)[0]
+            
+            # Get confidence
+            try:
+                confidence = max(model.predict_proba(df_input)[0]) * 100
+            except:
+                confidence = 50
+        except Exception as e:
+            print(f"Prediction error: {e}")
+            return None, 0
         
         return prediction, confidence
     

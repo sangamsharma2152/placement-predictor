@@ -19,9 +19,9 @@ train = CacheManager.load_training_data("train.csv")
 # Display stats
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Students", len(train))
-col2.metric("Placement Rate", f"{(train['Placement_Status'].sum() / len(train) * 100):.1f}%")
+col2.metric("Placement Rate", f"{(train['PlacementStatus'].eq('Placed').sum() / len(train) * 100):.1f}%")
 col3.metric("Avg CGPA", f"{train['CGPA'].mean():.2f}")
-col4.metric("Avg Aptitude", f"{train['Aptitude_Test_Score'].mean():.1f}")
+col4.metric("Avg Skills", f"{train['Skills'].mean():.1f}")
 
 st.divider()
 
@@ -44,17 +44,23 @@ with tab2:
     st.plotly_chart(create_correlation_heatmap(train), use_container_width=True)
 
 with tab3:
-    st.dataframe(train.head(20))
+    st.subheader(f"All {len(train)} Students Data")
+    st.dataframe(train)
+    
+    # Download data option
+    csv = train.to_csv(index=False)
+    st.download_button(
+        label="Download Full Dataset as CSV",
+        data=csv,
+        file_name="placement_data.csv",
+        mime="text/csv"
+    )
     
     # Filter options
     st.subheader("Filter Data")
-    branch_filter = st.multiselect("Select Branches", train['Branch'].unique())
-    status_filter = st.multiselect("Select Placement Status", [0, 1])
+    placement_filter = st.multiselect("Select Placement Status", train['PlacementStatus'].unique())
     
-    if branch_filter or status_filter:
-        filtered = train
-        if branch_filter:
-            filtered = filtered[filtered['Branch'].isin(branch_filter)]
-        if status_filter:
-            filtered = filtered[filtered['Placement_Status'].isin(status_filter)]
-        st.write(filtered)
+    if placement_filter:
+        filtered = train[train['PlacementStatus'].isin(placement_filter)]
+        st.write(f"Filtered Results: {len(filtered)} students")
+        st.dataframe(filtered)

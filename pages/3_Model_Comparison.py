@@ -90,28 +90,27 @@ col_test_a, col_test_b = st.columns(2)
 
 with col_test_a:
     test_cgpa = st.slider("Test CGPA", 0.0, 10.0, 7.0)
-    test_coding = st.slider("Test Coding", 0, 10, 5)
-    test_intern = st.number_input("Test Internships", 0, 10, 2)
+    test_skills = st.slider("Test Skills", 0, 10, 5)
+    test_projects = st.number_input("Test Major Projects", 0, 5, 2)
 
 with col_test_b:
-    test_aptitude = st.slider("Test Aptitude", 0, 100, 50)
-    test_comm = st.slider("Test Communication", 0, 10, 5)
-    test_projects = st.number_input("Test Projects", 0, 10, 2)
+    test_comm = st.slider("Test Communication", 0, 5, 3, 0.5)
+    test_mini = st.number_input("Test Mini Projects", 0, 5, 1)
+    test_backlogs = st.number_input("Test Backlogs", 0, 10, 0)
 
 if st.button("🚀 Test Model"):
     test_data = {
-        'Gender': 'M',
-        'Degree': 'B.Tech',
-        'Branch': 'CSE',
         'CGPA': test_cgpa,
-        'Internships': test_intern,
-        'Projects': test_projects,
-        'Coding_Skills': test_coding,
-        'Communication_Skills': test_comm,
-        'Aptitude_Test_Score': test_aptitude,
-        'Certifications': 1,
-        'Backlogs': 0,
-        'Age': 22
+        'Skills': test_skills,
+        'Communication Skill Rating': test_comm,
+        'Major Projects': test_projects,
+        'Mini Projects': test_mini,
+        'Workshops/Certificatios': 1,
+        'backlogs': test_backlogs,
+        'Internship': 'Yes',
+        'Hackathon': 'No',
+        '12th Percentage': 75,
+        '10th Percentage': 75
     }
     
     pred, conf = placement_model.predict(test_data, test_model)

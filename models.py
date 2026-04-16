@@ -227,13 +227,13 @@ class PlacementModel:
         if cgpa < 3.0 or cgpa > 10.0:
             anomalies.append("Unusual CGPA value")
         
-        backlogs = input_data.get('Backlogs', 0)
+        backlogs = input_data.get('backlogs', 0)
         if backlogs > 5:
             anomalies.append("High number of backlogs")
         
-        aptitude = input_data.get('Aptitude_Test_Score', 0)
-        if aptitude < 10:
-            anomalies.append("Very low aptitude score")
+        skills = input_data.get('Skills', 0)
+        if skills < 3:
+            anomalies.append("Very low skills score")
         
         return anomalies
     

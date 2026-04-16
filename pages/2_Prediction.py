@@ -25,41 +25,35 @@ with prediction_col:
     
     with col1:
         name = st.text_input("Full Name")
-        age = st.number_input("Age", 18, 30, 22)
-        gender = st.selectbox("Gender", ["M", "F"])
+        cgpa = st.slider("CGPA (0-10)", 0.0, 10.0, 7.0, 0.1)
+        major_projects = st.number_input("Major Projects", 0, 5, 1)
     
     with col2:
         email = st.text_input("Email")
-        branch = st.selectbox("Branch", ["CSE", "ECE", "ME", "IT"])
-        degree = st.selectbox("Degree", ["B.Tech", "B.Sc"])
+        internship = st.selectbox("Internship", ["Yes", "No"])
+        workshops = st.number_input("Workshops/Certificates", 0, 10, 1)
     
     with col3:
-        cgpa = st.slider("CGPA", 0.0, 10.0, 7.0, 0.1)
-        internships = st.number_input("Internships", 0, 10, 1)
-        projects = st.number_input("Projects", 0, 10, 2)
+        skills = st.slider("Skills (0-10)", 0, 10, 5)
+        mini_projects = st.number_input("Mini Projects", 0, 5, 1)
+        communication = st.slider("Communication Rating (0-5)", 0, 5, 3, 0.5)
     
     st.divider()
     
     col4, col5, col6 = st.columns(3)
     
     with col4:
-        coding_skills = st.slider("Coding Skills (0-10)", 0, 10, 5)
+        percentage_10th = st.number_input("10th Percentage", 30, 100, 75)
     
     with col5:
-        communication_skills = st.slider("Communication (0-10)", 0, 10, 5)
+        percentage_12th = st.number_input("12th Percentage", 30, 100, 75)
     
     with col6:
-        aptitude_score = st.slider("Aptitude Score (0-100)", 0, 100, 50)
+        backlogs = st.number_input("Backlogs", 0, 10, 0)
     
     st.divider()
     
-    col7, col8 = st.columns(2)
-    
-    with col7:
-        certifications = st.number_input("Certifications", 0, 10, 1)
-    
-    with col8:
-        backlogs = st.number_input("Backlogs", 0, 10, 0)
+    hackathon = st.selectbox("Hackathon Participation", ["Yes", "No"])
     
     # Model selection
     st.subheader("🤖 Model Selection")
@@ -69,18 +63,17 @@ with prediction_col:
     student_data = {
         'name': name,
         'email': email,
-        'Age': age,
-        'Gender': gender,
-        'Degree': degree,
-        'Branch': branch,
         'CGPA': cgpa,
-        'Internships': internships,
-        'Projects': projects,
-        'Coding_Skills': coding_skills,
-        'Communication_Skills': communication_skills,
-        'Aptitude_Test_Score': aptitude_score,
-        'Certifications': certifications,
-        'Backlogs': backlogs
+        'Skills': skills,
+        'Communication Skill Rating': communication,
+        'Major Projects': major_projects,
+        'Mini Projects': mini_projects,
+        'Workshops/Certificatios': workshops,
+        '12th Percentage': percentage_12th,
+        '10th Percentage': percentage_10th,
+        'backlogs': backlogs,
+        'Internship': internship,
+        'Hackathon': hackathon
     }
     
     col_pred_a, col_pred_b = st.columns(2)

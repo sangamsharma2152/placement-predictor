@@ -167,11 +167,11 @@ class CacheManager:
         """Compute statistics with caching"""
         stats = {
             'total_students': len(df),
-            'placement_rate': (df['Placement_Status'].sum() / len(df) * 100),
+            'placement_rate': (df['PlacementStatus'].eq('Placed').sum() / len(df) * 100),
             'avg_cgpa': df['CGPA'].mean(),
-            'avg_aptitude': df['Aptitude_Test_Score'].mean(),
-            'total_placed': df['Placement_Status'].sum(),
-            'total_not_placed': len(df) - df['Placement_Status'].sum()
+            'avg_skills': df['Skills'].mean(),
+            'total_placed': df['PlacementStatus'].eq('Placed').sum(),
+            'total_not_placed': df['PlacementStatus'].eq('NotPlaced').sum()
         }
         return stats
 

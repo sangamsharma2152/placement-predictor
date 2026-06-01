@@ -220,9 +220,9 @@ if page == "Home":
         col_a, col_b = st.columns(2)
         with col_a:
             if st.button(
-    "Make Prediction",
-    use_container_width=True
-):
+                "Make Prediction",
+                use_container_width=True
+            ):
 
     st.session_state.page="Predictions"
 

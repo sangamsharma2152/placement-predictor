@@ -92,6 +92,59 @@ with st.sidebar:
             "Settings",
             "Admin Panel"
         ]
+        
+
+
+    if "page" not in st.session_state:
+
+        st.session_state.page = "Home"
+
+
+
+    page = st.radio(
+
+        "Navigation",
+
+        pages,
+
+        index=pages.index(
+            st.session_state.page
+        )
+
+    )
+
+
+    st.session_state.page = page
+
+
+    st.divider()
+
+
+    col1,col2 = st.columns(2)
+
+
+    with col1:
+
+        if st.button(
+            "Dark Theme"
+        ):
+
+            st.session_state.theme="dark"
+
+
+
+    with col2:
+
+        if st.button(
+            "Light Theme"
+        ):
+
+            st.session_state.theme="light"
+
+
+
+    st.caption(
+        "Placement Predictor v2.0 Advanced"
     )
     
     st.markdown("---")

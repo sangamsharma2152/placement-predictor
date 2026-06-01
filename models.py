@@ -39,6 +39,13 @@ class PlacementModel:
         cols_to_drop = [col for col in self.df.columns if col in ['StudentId', 'Unnamed: 0']]
         self.df = self.df.drop(columns=cols_to_drop, errors='ignore')
         
+        # Encode target variable first (before other transformations)
+        if TARGET_COL in self.df.columns:
+            if self.df[TARGET_COL].dtype == 'object':
+                le_target = LabelEncoder()
+                self.df[TARGET_COL] = le_target.fit_transform(self.df[TARGET_COL].astype(str))
+                self.label_encoders['_target_'] = le_target
+        
         # Encode categorical variables
         for col in CATEGORICAL_COLS:
             if col in self.df.columns:
@@ -48,13 +55,7 @@ class PlacementModel:
         
         # Features and target
         self.X = self.df.drop([TARGET_COL], axis=1, errors='ignore')
-        self.y = self.df[TARGET_COL]
-        
-        # Encode target variable if it's categorical
-        if self.y.dtype == 'object':
-            le_target = LabelEncoder()
-            self.y = le_target.fit_transform(self.y)
-            self.label_encoders['_target_'] = le_target
+        self.y = self.df[TARGET_COL].astype(np.int32)
         
         self.feature_names = self.X.columns.tolist()
         
@@ -62,6 +63,10 @@ class PlacementModel:
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y, test_size=TEST_SIZE, random_state=RANDOM_STATE
         )
+        
+        # Ensure y_test and y_train are numeric
+        self.y_train = np.asarray(self.y_train, dtype=np.int32)
+        self.y_test = np.asarray(self.y_test, dtype=np.int32)
     
     def train_models(self):
         """Train multiple models"""
@@ -104,55 +109,33 @@ class PlacementModel:
         if model_name not in self.models:
             return None
         
-        model = self.models[model_name]
-        y_pred = model.predict(self.X_test)
-        
-        # Ensure y_test and y_pred are compatible
-        y_test_numeric = self.y_test.copy()
-        y_pred_numeric = y_pred.copy()
-        
-        # Convert Series to numpy array if needed
-        if isinstance(y_test_numeric, pd.Series):
-            y_test_numeric = y_test_numeric.values
-        
-        # Ensure both are numeric
         try:
-            # Try using the stored target encoder if available
-            if '_target_' in self.label_encoders:
-                if y_test_numeric.dtype == 'object':
-                    y_test_numeric = self.label_encoders['_target_'].transform(y_test_numeric)
-                if y_pred_numeric.dtype == 'object':
-                    y_pred_numeric = self.label_encoders['_target_'].transform(y_pred_numeric)
-            else:
-                # Fallback: encode individually but ensure consistency
-                if y_test_numeric.dtype == 'object':
-                    le_test = LabelEncoder()
-                    y_test_numeric = le_test.fit_transform(y_test_numeric)
-                if y_pred_numeric.dtype == 'object':
-                    le_pred = LabelEncoder()
-                    y_pred_numeric = le_pred.fit_transform(y_pred_numeric)
+            model = self.models[model_name]
+            y_pred = model.predict(self.X_test)
+            
+            # Ensure both are numpy arrays of the same type
+            y_test_numeric = np.asarray(self.y_test, dtype=np.int32)
+            y_pred_numeric = np.asarray(y_pred, dtype=np.int32)
+            
+            # Calculate metrics
+            metrics = {
+                'Accuracy': accuracy_score(y_test_numeric, y_pred_numeric),
+                'Precision': precision_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
+                'Recall': recall_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
+                'F1-Score': f1_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary')
+            }
+            
+            # Try to get ROC-AUC
+            try:
+                y_pred_proba = model.predict_proba(self.X_test)[:, 1]
+                metrics['ROC-AUC'] = roc_auc_score(y_test_numeric, y_pred_proba)
+            except Exception as e:
+                metrics['ROC-AUC'] = None
+            
+            return metrics
         except Exception as e:
-            print(f"Error encoding targets: {e}")
+            print(f"Error calculating metrics for {model_name}: {str(e)}")
             return None
-        
-        # Ensure both are numpy arrays and same length
-        y_test_numeric = np.asarray(y_test_numeric, dtype=np.int32)
-        y_pred_numeric = np.asarray(y_pred_numeric, dtype=np.int32)
-        
-        metrics = {
-            'Accuracy': accuracy_score(y_test_numeric, y_pred_numeric),
-            'Precision': precision_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
-            'Recall': recall_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary'),
-            'F1-Score': f1_score(y_test_numeric, y_pred_numeric, zero_division=0, average='binary')
-        }
-        
-        try:
-            y_pred_proba = model.predict_proba(self.X_test)[:, 1]
-            metrics['ROC-AUC'] = roc_auc_score(y_test_numeric, y_pred_proba)
-        except:
-            metrics['ROC-AUC'] = None
-        
-        return metrics
     
     def predict(self, input_data, model_name='Random Forest'):
         """Make prediction on new data"""
@@ -290,7 +273,7 @@ class PlacementModel:
             if cgpa < 7:
                 suggestions.append({
                     'priority': 'High',
-                    'suggestion': '📈 Improve CGPA to above 7.0',
+                    'suggestion': 'Improve CGPA to above 7.0',
                     'impact': 'Critical for placement'
                 })
             
@@ -298,7 +281,7 @@ class PlacementModel:
             if coding < 6:
                 suggestions.append({
                     'priority': 'High',
-                    'suggestion': '💻 Enhance coding skills (Target: 7+)',
+                    'suggestion': 'Enhance coding skills (Target: 7+)',
                     'impact': 'Key for tech roles'
                 })
             
@@ -306,7 +289,7 @@ class PlacementModel:
             if communication < 6:
                 suggestions.append({
                     'priority': 'High',
-                    'suggestion': '🗣️ Improve communication skills',
+                    'suggestion': 'Improve communication skills',
                     'impact': 'Essential for HR round'
                 })
             
@@ -314,7 +297,7 @@ class PlacementModel:
             if internships < 2:
                 suggestions.append({
                     'priority': 'Medium',
-                    'suggestion': '🏢 Gain at least 2 internships',
+                    'suggestion': 'Gain at least 2 internships',
                     'impact': 'Demonstrates practical experience'
                 })
             
@@ -322,7 +305,7 @@ class PlacementModel:
             if projects < 2:
                 suggestions.append({
                     'priority': 'Medium',
-                    'suggestion': '📂 Build 2+ real-world projects',
+                    'suggestion': 'Build 2+ real-world projects',
                     'impact': 'Portfolio building'
                 })
             
@@ -330,7 +313,7 @@ class PlacementModel:
             if certifications < 1:
                 suggestions.append({
                     'priority': 'Low',
-                    'suggestion': '📜 Get relevant certifications',
+                    'suggestion': 'Get relevant certifications',
                     'impact': 'Adds credibility'
                 })
             
@@ -338,14 +321,14 @@ class PlacementModel:
             if backlogs > 0:
                 suggestions.append({
                     'priority': 'Critical',
-                    'suggestion': '❌ Clear all backlogs',
+                    'suggestion': 'Clear all backlogs',
                     'impact': 'Most companies require 0 backlogs'
                 })
         else:  # Placed
             if not suggestions:
                 suggestions.append({
                     'priority': 'Info',
-                    'suggestion': '🔥 Excellent profile! Keep improving skills',
+                    'suggestion': 'Excellent profile! Keep improving skills',
                     'impact': 'Continue learning and growing'
                 })
         

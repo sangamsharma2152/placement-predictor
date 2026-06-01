@@ -481,7 +481,7 @@ elif page == "Predictions":
         else:
             st.info("📌 No data yet. Make a prediction to populate stats!")
 
-elif page == "📊 Analytics":
+elif page == " Analytics":
     st.title("📊 Advanced Analytics & Statistics")
     
     train_df = CacheManager.load_training_data("train.csv")
@@ -561,7 +561,7 @@ elif page == "📊 Analytics":
         st.info(f"📌 Showing {len(filtered_df)} records")
         st.dataframe(filtered_df, use_container_width=True)
 
-elif page == "📈 Batch Upload":
+elif page == "Batch Upload":
     st.title("📈 Batch Prediction Upload")
     
     st.markdown("""
@@ -662,7 +662,7 @@ elif page == "📈 Batch Upload":
         - Maximum 1000 records per upload
         """)
 
-elif page == "📋 Leaderboard":
+elif page == " Leaderboard":
     st.title("📋 Leaderboard & Rankings")
     
     all_preds = db.get_all_predictions()
@@ -703,7 +703,7 @@ elif page == "📋 Leaderboard":
     else:
         st.info("📌 No predictions yet. Make predictions to populate the leaderboard!")
 
-elif page == "🎯 Goal Tracker":
+elif page == " Goal Tracker":
     st.title("🎯 Personal Goal Tracker")
     
     st.markdown("""
@@ -766,7 +766,7 @@ elif page == "🎯 Goal Tracker":
         📜 Certifications: 2+
         """)
 
-elif page == "🏆 Achievements":
+elif page == " Achievements":
     st.title("🏆 Achievements & Badges")
     
     st.markdown("""
@@ -813,7 +813,7 @@ elif page == "🏆 Achievements":
     col2.metric("✅ Unlocked", unlocked_count)
     col3.metric("📈 Progress", f"{unlocked_count/total_achievements*100:.0f}%" if total_achievements > 0 else "0%")
 
-elif page == "📚 Learning Resources":
+elif page == " Learning Resources":
     st.title("📚 Learning Resources & Interview Prep")
     
     st.markdown("""
@@ -915,7 +915,7 @@ elif page == "📚 Learning Resources":
         - Company-specific Glassdoor reviews
         """)
 
-elif page == "📊 Reports":
+elif page == " Reports":
     st.title("📊 Reports & Downloads")
     
     all_preds = db.get_all_predictions()
@@ -958,7 +958,7 @@ elif page == "📊 Reports":
     else:
         st.info("📌 No predictions yet. Make predictions to generate reports!")
 
-elif page == "⚙️ Settings":
+elif page == " Settings":
     st.title("⚙️ Settings & Preferences")
     
     st.subheader("🎨 Appearance")
@@ -1010,7 +1010,7 @@ elif page == "⚙️ Settings":
         if st.button("📥 Export My Data", use_container_width=True):
             st.info("Data export feature coming soon")
 
-elif page == "🔧 Admin Panel":
+elif page == " Admin Panel":
     st.title("🔧 Admin Panel")
     
     admin_password = st.text_input("Admin Password", type="password", key="admin_pass")

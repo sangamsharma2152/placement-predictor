@@ -223,10 +223,11 @@ if page == "Home":
             if st.button( "Make Prediction", use_container_width=True ):
                 st.session_state.page = "Predictions"
                 st.rerun()
-                with col_b:
-                if st.button( "View Analytics", use_container_width=True ):
-                    st.session_state.page = "Analytics"
-                    st.rerun()
+                
+        with col_b:
+            if st.button( "View Analytics", use_container_width=True ):
+                st.session_state.page = "Analytics"
+                st.rerun()
 
 
 

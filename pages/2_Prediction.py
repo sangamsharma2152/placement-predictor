@@ -11,7 +11,7 @@ from database import db
 from utils import ReportGenerator, Achievement, DataValidator, SessionManager
 from config import INTERVIEW_QUESTIONS
 
-st.title("🤖 Advanced Placement Prediction Engine")
+st.title("Advanced Placement Prediction Engine")
 
 SessionManager.init_session_state()
 
@@ -19,7 +19,7 @@ SessionManager.init_session_state()
 prediction_col, results_col = st.columns([1.5, 1])
 
 with prediction_col:
-    st.subheader("📝 Enter Student Profile")
+    st.subheader("Enter Student Profile")
     
     col1, col2, col3 = st.columns(3)
     
@@ -56,7 +56,7 @@ with prediction_col:
     hackathon = st.selectbox("Hackathon Participation", ["Yes", "No"])
     
     # Model selection
-    st.subheader("🤖 Model Selection")
+    st.subheader("Model Selection")
     model_name = st.selectbox("Select Model", 
         ["Random Forest", "Logistic Regression", "Decision Tree", "SVM", "Gradient Boosting", "XGBoost"])
     
@@ -79,7 +79,7 @@ with prediction_col:
     col_pred_a, col_pred_b = st.columns(2)
     
     with col_pred_a:
-        predict_btn = st.button("🚀 Make Prediction", use_container_width=True)
+        predict_btn = st.button("Make Prediction", use_container_width=True)
     
     with col_pred_b:
         what_if_btn = st.checkbox("❓ What-If Analysis")
@@ -92,21 +92,21 @@ with results_col:
         if errors:
             st.error("Validation Errors:")
             for error in errors:
-                st.write(f"❌ {error}")
+                st.write(f"Error: {error}")
         else:
             # Make prediction
             with st.spinner("Analyzing profile..."):
                 prediction, confidence = placement_model.predict(student_data, model_name)
                 
                 if prediction == 1:
-                    st.success(f"✅ PLACEMENT PREDICTED\n\nConfidence: {confidence:.1f}%")
+                    st.success(f"PLACEMENT PREDICTED\n\nConfidence: {confidence:.1f}%")
                 else:
-                    st.error(f"❌ NOT LIKELY TO BE PLACED\n\nConfidence: {100-confidence:.1f}%")
+                    st.error(f"NOT LIKELY TO BE PLACED\n\nConfidence: {100-confidence:.1f}%")
 
 st.divider()
 
 # Detailed Analysis Tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 Suggestions", "🎯 Anomalies", "📊 Comparison", "❓ What-If", "📄 Report"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Suggestions", "Anomalies", "Comparison", "What-If", "Report"])
 
 with tab1:
     st.subheader("💡 Personalized Suggestions")
@@ -127,12 +127,12 @@ with tab2:
         anomalies = placement_model.detect_anomalies(student_data)
         if anomalies:
             for anomaly in anomalies:
-                st.warning(f"⚠️ {anomaly}")
+                st.warning(f"Warning: {anomaly}")
         else:
-            st.success("✅ No anomalies detected")
+            st.success("No anomalies detected")
 
 with tab3:
-    st.subheader("📊 Model Comparison")
+    st.subheader("Model Comparison")
     if predict_btn:
         comparison = placement_model.get_all_models_comparison()
         st.dataframe(comparison)
@@ -165,7 +165,7 @@ with tab4:
         })
         
         scenario_pred, scenario_conf = placement_model.predict(scenario_data, model_name)
-        st.info(f"Scenario Result: {'✅ PLACED' if scenario_pred == 1 else '❌ NOT PLACED'} ({scenario_conf:.1f}% confidence)")
+        st.info(f"Scenario Result: {'PLACED' if scenario_pred == 1 else 'NOT PLACED'} ({scenario_conf:.1f}% confidence)")
 
 with tab5:
     st.subheader("📄 Generate Report")

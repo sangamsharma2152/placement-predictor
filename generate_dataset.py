@@ -47,8 +47,8 @@ df = pd.DataFrame(data)
 
 # Save to CSV
 df.to_csv('train.csv', index=False)
-print(f"✅ Generated {num_records:,} student records")
-print(f"✅ Saved to: train.csv")
+print(f"Generated {num_records:,} student records")
+print(f"Saved to: train.csv")
 print(f"\nDataset Statistics:")
 print(f"  - Total Students: {len(df):,}")
 print(f"  - Placed: {df['Placement_Status'].sum():,} ({df['Placement_Status'].mean()*100:.1f}%)")

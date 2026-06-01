@@ -20,7 +20,7 @@ insights_data = [
 ]
 
 for title, insight in insights_data:
-    with st.expander(f"💡 {title}", expanded=False):
+    with st.expander(f"{title}", expanded=False):
         st.write(insight)
 
 st.divider()
@@ -34,7 +34,7 @@ with tab1:
     st.write("### Technical Interview Questions")
     for idx, q in enumerate(INTERVIEW_QUESTIONS.get("Technical", []), 1):
         with st.expander(f"Q{idx}: {q}"):
-            st.write("💡 **Sample Answer:** [Answer will be filled based on topic]")
+            st.write("**Sample Answer:** [Answer will be filled based on topic]")
             st.write("**Key Points to Cover:**")
             st.write("- Concept explanation")
             st.write("- Real-world application")
@@ -44,7 +44,7 @@ with tab2:
     st.write("### HR Interview Questions")
     for idx, q in enumerate(INTERVIEW_QUESTIONS.get("HR", []), 1):
         with st.expander(f"Q{idx}: {q}"):
-            st.write("💡 **Sample Answer:** [Answer will be filled]")
+            st.write("**Sample Answer:** [Answer will be filled]")
             st.write("**Tips:**")
             st.write("- Be honest and authentic")
             st.write("- Provide specific examples")
@@ -54,7 +54,7 @@ with tab3:
     st.write("### Aptitude Interview Topics")
     for idx, q in enumerate(INTERVIEW_QUESTIONS.get("Aptitude", []), 1):
         with st.expander(f"Q{idx}: {q}"):
-            st.write("💡 **Approach:** [Methodology explained]")
+            st.write("**Approach:** [Methodology explained]")
             st.write("**Practice Resources:**")
             st.write("- Online platforms (HackerEarth, IndiaBix)")
             st.write("- Previous year papers")
@@ -92,7 +92,7 @@ for category, subcats in resources.items():
 st.divider()
 
 # Success Stories
-st.subheader("🌟 Success Stories")
+st.subheader("Success Stories")
 
 success_stories = [
     {
@@ -135,7 +135,7 @@ for story in success_stories:
 st.divider()
 
 # Final Recommendations
-st.subheader("🎯 Final Recommendations")
+st.subheader("Final Recommendations")
 
 st.info("""
 ### To Maximize Your Placement Chances:
@@ -167,6 +167,6 @@ st.info("""
 - Develop problem-solving mindset
 - Stay organized and motivated
 
-✅ **Success Formula:** Academic Excellence + Technical Skills + Practical Experience + Soft Skills + Persistence
+**Success Formula:** Academic Excellence + Technical Skills + Practical Experience + Soft Skills + Persistence
 """)
 

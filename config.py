@@ -23,7 +23,7 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
 SENDER_PASSWORD = os.getenv("SENDER_PASSWORD", "")
 
 # App Settings
-APP_TITLE = "🎓 AI-Based Student Placement Advisor"
+APP_TITLE = "AI-Based Student Placement Advisor"
 APP_DESCRIPTION = "Predict placement chances and get personalized improvement suggestions"
 
 # Model Configuration

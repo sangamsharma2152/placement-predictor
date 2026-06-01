@@ -32,7 +32,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 Student Placement Data Dashboard")
+st.title("Student Placement Data Dashboard")
 st.caption("Comprehensive analysis of 10,000 student placement records")
 
 train = CacheManager.load_training_data("train.csv")
@@ -42,7 +42,7 @@ cols_to_drop = [col for col in train.columns if col in ['Unnamed: 0', 'StudentId
 train = train.drop(columns=cols_to_drop, errors='ignore')
 
 # Extended Statistics Section
-st.subheader("📈 Key Metrics Overview")
+st.subheader("Key Metrics Overview")
 col1, col2, col3, col4, col5 = st.columns(5)
 col1.metric("Total Students", f"{len(train):,}")
 
@@ -67,7 +67,7 @@ except:
     col5.metric("Internships", "N/A")
 
 # Additional detailed metrics
-st.subheader("📊 Additional Statistics")
+st.subheader("Additional Statistics")
 col1, col2, col3, col4 = st.columns(4)
 
 try:
@@ -96,7 +96,7 @@ except:
 
 st.divider()
 
-tab1, tab2, tab3, tab4 = st.tabs(["📈 Overview", "🔍 Detailed Analysis", "📊 Raw Data", "🏆 Advanced Analytics"])
+tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Detailed Analysis", "Raw Data", "Advanced Analytics"])
 
 with tab1:
     col1, col2 = st.columns(2)
@@ -111,7 +111,7 @@ with tab1:
     with col4:
         st.markdown("### 📌 Quick Insights")
         placed = train['PlacementStatus'].eq('Placed').sum() if 'PlacementStatus' in train.columns else 0
-        st.write(f"✅ **Students Placed:** {placed:,}")
+        st.write(f"**Students Placed:** {placed:,}")
         st.write(f"📍 **Placement Success Rate:** {(placed/len(train)*100):.1f}%")
         st.write(f"⭐ **Avg CGPA (Placed):** {train[train['PlacementStatus'].eq('Placed')]['CGPA'].mean():.2f}" if 'PlacementStatus' in train.columns else "")
 
@@ -153,7 +153,7 @@ with tab3:
         st.dataframe(filtered)
 
 with tab4:
-    st.subheader("🏆 Advanced Analytics & Insights")
+    st.subheader("Advanced Analytics & Insights")
     
     # Student Distribution by Status
     col1, col2 = st.columns(2)
@@ -177,7 +177,7 @@ with tab4:
     st.divider()
     
     # Correlation Analysis
-    st.markdown("### 📊 Key Correlations with Placement")
+    st.markdown("### Key Correlations with Placement")
     numeric_cols = train.select_dtypes(include=['float64', 'int64']).columns
     
     try:

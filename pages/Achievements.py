@@ -6,7 +6,7 @@ import streamlit as st
 from utils import Achievement
 from database import db
 
-st.title("🏆 Achievements & Badges")
+st.title("Achievements & Badges")
 
 st.write("Earn achievements by reaching milestones in your placement journey!")
 
@@ -45,7 +45,7 @@ if student_id:
                 st.markdown(f"""
                     <div style='background: linear-gradient(135deg, #51cf66 0%, #2f9e44 100%); 
                                 padding: 15px; border-radius: 8px; text-align: center; color: white;'>
-                        <h3>{ach['icon'] if 'icon' in ach else '⭐'}</h3>
+                        <h3>{ach['icon'] if 'icon' in ach else 'Badge'}</h3>
                         <p><b>{ach['achievement_name']}</b></p>
                         <small>{ach['description']}</small>
                     </div>
@@ -55,30 +55,30 @@ if student_id:
 
 st.divider()
 
-st.subheader("💡 How to Unlock Achievements")
+st.subheader("How to Unlock Achievements")
 
 st.write("""
-**First Prediction** 🎯
+**First Prediction**
 - Make your first placement prediction
 
-**High Scorer** ⭐
+**High Scorer**
 - Achieve CGPA above 8.5
 
-**Coding Master** 💻
+**Coding Master**
 - Reach Coding Skills score of 8 or higher
 
-**Placement Ready** 🚀
+**Placement Ready**
 - All metrics above recommended thresholds
 
-**Skill Builder** 🏗️
+**Skill Builder**
 - Complete 3 or more certifications
 
-**Intern Pro** 🏢
+**Intern Pro**
 - Complete 3 or more internships
 
-**Great Communicator** 🗣️
+**Great Communicator**
 - Communication skills above 8
 
-**Perfect Profile** 🌟
+**Perfect Profile**
 - All scores at maximum levels
 """)

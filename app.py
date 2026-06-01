@@ -217,45 +217,45 @@ if page == "Home":
     
     with col2:
         st.subheader("Quick Actions")
+        
         col_a, col_b = st.columns(2)
         with col_a:
-            if st.button(
-                "Make Prediction",
-                use_container_width=True
-            ):
+            if st.button( "Make Prediction", use_container_width=True ):
+                st.session_state.page = "Predictions"
+                st.rerun()
+                with col_b:
+                if st.button( "View Analytics", use_container_width=True ):
+                    st.session_state.page = "Analytics"
+                    st.rerun()
 
-    st.session_state.page="Predictions"
 
-    st.rerun()
-        with col_b:
-            if st.button(
-    "View Analytics",
-    use_container_width=True
-):
 
-    st.session_state.page="Analytics"
+col_c, col_d = st.columns(2)
 
-    st.rerun()
-        
-        col_c, col_d = st.columns(2)
-        with col_c:
-            if st.button(
-    "Learning",
-    use_container_width=True
-):
 
-    st.session_state.page="Learning Resources"
+with col_c:
 
-    st.rerun()
-        with col_d:
-            if st.button(
-    "Achievements",
-    use_container_width=True
-):
+    if st.button(
+        "Learning",
+        use_container_width=True
+    ):
 
-    st.session_state.page="Achievements"
+        st.session_state.page = "Learning Resources"
 
-    st.rerun()
+        st.rerun()
+
+
+
+with col_d:
+
+    if st.button(
+        "Achievements",
+        use_container_width=True
+    ):
+
+        st.session_state.page = "Achievements"
+
+        st.rerun()
     
     st.divider()
     

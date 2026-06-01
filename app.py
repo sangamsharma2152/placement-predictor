@@ -92,7 +92,8 @@ with st.sidebar:
             "Settings",
             "Admin Panel"
         ]
-        
+    )
+    
 
 
     if "page" not in st.session_state:

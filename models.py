@@ -196,13 +196,19 @@ class PlacementModel:
 
 
 
-        self.X_train,self.X_test,self.y_train,self.y_test = train_test_split(
+        self.X_train,self.X_test,self.y_train,self.y_test =train_test_split(
 
-            self.X,
+self.X,
 
-            self.y,
+self.y,
 
-            test_size=TEST_SIZE,
+test_size=0.3,
+
+random_state=42,
+
+shuffle=True
+
+)
 
             random_state=RANDOM_STATE,
 
